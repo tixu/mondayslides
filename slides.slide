@@ -1,0 +1,515 @@
+# http://godoc.org/code.google.com/p/go.tools/present
+# Present files have the following format.
+# The first non-blank non-comment line is the title.
+# The subtitle, date, and tags lines are optional.
+First Impression
+From
+06:19 22 Sep 2014
+Tags: foo, bar, baz
+
+Author Xavier
+Job title, No matter
+xavier.ernest.zebier@gmail.com
+@tixu
+* Languages : First Impression
+
+* The Go programming language
+
+The promises ....
+
+- Modern
+
+# OO support but not type-oriented
+# strong support for concurrency
+- Compact, concise, general-purpose
+- Imperative, statically type-checked, dynamically type-safe
+- Garbage-collected
+- Compiles to native code, statically linked
+- Fast compilation, efficient execution
+
+Less is more
+
+
+* The Go from a java perspective
+
+
+Golang seems to be very rustic.
+
+The language  misses apparently a lot of features of so called modern language.
+
+- Not really Object Oriented
+
+- No exception handling
+
+- No funny functionnal stuff
+
+- No Virtual machine
+
+- No generics
+
+But let see ...
+
+* GO First Program
+
+Our first example
+
+.play ./code/hello.go /START1/,/STOP1/
+
+* Hello, World! Internet-style
+
+.play code/hellohttp.go
+
+
+* Program elements
+
+* Constants
+
+- Maintained precisely:
+	const e = 2.71828182845904523536028747135266249775724709369995957496696763
+	const third = 1/3
+- Typed or without type:
+	const M64 int64 = 1<<20
+				const M = 1<<20
+- Evaluated at compile-time:
+	const big = 1<<100 / 1e30  // valid constant expression
+
+Compiler complains if a constant doesn't fit where it is _used_.
+
+
+* Variables
+
+- Statically typed:
+	var x int
+	var s, t string
+- Implicitly or explicitly initialized:
+	var x int
+	var s, t string = "foo", "bar"  // multiple assignment
+
+	var x = 42                      // int
+	var s, b = "foo", true          // string, bool
+- Short variable declaration (inside functions only):
+	x := 42
+	s, b := "foo", true
+- Can safely take address of _any_ variable!
+	return &x
+# compiler will do the right thing
+
+
+* Types
+
+- Predeclared types, the usual suspects:
+	uint8 (byte), uint16, uint32, uint32, uint64,
+	int8, int16, int32, int32 (rune), int64,
+	float32, float64,
+	complex64, complex128,
+	uint, int, uintptr,
+	bool, string,
+	error  // not so usual
+
+- Composite types:
+	array, struct, pointer, function,
+	slice, map, channel
+
+- Abstract type:
+	interface
+* Slices
+
+	[]T  // slice of T
+
+- Descriptor for an underlying array segment
+- May grow and shrink
+- Has length and capacity
+- Assigning a slice copies the descriptor, not the underlying array
+
+Common slice operations:
+
+	len(s)
+	s[i]
+	s[i:j]
+	append(s, x)  // append element x to slice s and return new slice
+
+- Slices play the role of dynamically sized arrays
+- Widely used in Go code
+
+
+* Maps
+
+	map[K]V  // map K -> V
+
+- Map is a language-supplied hash table
+- Maps values of key type K to values of type V
+- Assigning a map copies the map reference, not the map contents
+
+Common map operations:
+
+	make(map[K]V)
+	len(m)
+	m[k]
+	delete(m, k)
+
+- Map iteration order is not specified:
+
+	for key, value := range m {
+		// order of key sequence different each time
+	}
+
+* Statements
+
+- Curly braces (C style)
+- Multiple assignments and some other new constructs
+- Many cleanups: mandatory braces, no parentheses for conditionals, implicit break in switches, no semicolons, etc.
+	a, b = b, a                 // swap
+	f, err = os.Open(filename)
+
+	if x < y {
+		return x
+	} else {
+		return y
+	}
+
+	switch day {
+	case Mon:
+		...
+		// break is implicit
+	case Tue, Wed:
+		...
+	}
+
+
+* Type declarations
+
+- Composition from left-to-right (Pascal style):
+	[10]byte  // array of 10 bytes
+
+	struct {
+		name        string
+		left, right *Node
+		action      func(*Node)
+	}
+
+	func(a, b, c int)
+	func(http.ResponseWriter, *http.Request) error
+
+- A type declaration defines a _new_ type:
+	type Weekday int
+
+	type Point struct {
+		x, y int
+	}
+
+* Functions
+
+- Regular functions
+	func Sin(x float64) float64
+	func AddScale(x, y int, f float64) int
+
+- Multiple return values
+	func Write(data []byte) (written int, err error)
+
+- Variadic parameter lists without magic
+	func Printf(format string, args ...interface{})
+
+- Functions are first-class values
+	var delta int
+	return func(x int) int { return x + delta }
+
+
+
+* Function values: An example
+
+
+.code code/functionvalue.go /START1/,/END1/
+.play ./code/functionvalue.go /START2/,/END2/
+
+* Methods
+
+Methods are functions with a _receiver_ parameter:
+
+.code code/People.go /Greet START/,/Greet END/
+
+The receiver binds the method to its _base_type_ (People):
+
+.code code/People.go /People START/,/People END/
+
+Methods are invoked via the usual dot notation:
+
+.play code/People.go /main START/,/main END/
+
+* Why pointers?
+
+Control what you pass to functions.
+
+- passing values, no side-effects:
+
+	func double(x int) {
+		x *= 2
+	}
+
+- passing pointers: side-effects possible:
+
+	func double(x *int) {
+		*x *= 2
+	}
+
+Control your memory layout.
+
+- compare []Person and []*Person
+
+* Method declarations on pointers
+
+Receivers behave like any other argument.
+
+Pointers allow modifying the pointed receiver:
+
+	func (p *Person) IncAge() {
+		p.age++
+	}
+
+The method receiver is a copy of a pointer (pointing to the same address).
+
+Method calls on nil receivers are perfectly valid (and useful!).
+
+	func (p *Person) Name() string {
+		if p == nil {
+			return "anonymous"
+		}
+		return p.name
+	}
+
+
+* Composition : the go way
+
+
+
+* Composition vs inheritance
+
+I used to think about classes and types.
+
+Go resists this:
+
+- No inheritance.
+- No subtype polymorphism.
+- No generics.
+
+* Composition
+
+
+Given a type `People`, we create two new types:
+
+.code code/embedsample.go /COMPOSITION START/,/COMPOSITION END/
+
+
+All fields and methods from `Person` are available on `Employee`:
+
+.code code/embedsample.go /FIELDS START/,/FIELDS END/
+
+* Composition (2)
+
+.play code/embedsample.go /main START/,/main END/
+* Interfaces: first impressions
+
+* Interfaces
+
+
+
+It instead emphasizes _interfaces_.
+**
+
+* Interfaces: the Go way
+
+Go interfaces are small.
+
+	type Stringer interface {
+		String() string
+	}
+
+A `Stringer` can pretty print itself.
+Anything that implements `String` is a `Stringer`.
+
+
+* A larger interface
+
+`sort.Interface` describes the operations required to sort a collection:
+
+	type Interface interface {
+	    Len() int
+	    Less(i, j int) bool
+	    Swap(i, j int)
+	}
+
+`IntSlice` can sort a slice of ints:
+
+	type IntSlice []int
+
+	func (p IntSlice) Len() int           { return len(p) }
+	func (p IntSlice) Less(i, j int) bool { return p[i] < p[j] }
+	func (p IntSlice) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
+
+`sort.Sort` uses can sort a `[]int` with `IntSlice`:
+
+.play go4gophers/sort.go /START/,/STOP/
+* Another interface example
+
+The `Organ` type describes a body part and can print itself:
+
+.play go4gophers/organs.go /type Organ/,$
+
+
+* Sorting organs
+
+The `Organs` type knows how to describe and mutate a slice of organs:
+
+.code go4gophers/organs2.go /PART1/,/PART2/
+
+The `ByName` and `ByWeight` types embed `Organs` to sort by different fields:
+
+.code go4gophers/organs2.go /PART2/,/PART3/
+
+With embedding we compose _types_.
+
+
+* Sorting organs (continued)
+
+To sort a `[]*Organ`, wrap it with `ByName` or `ByWeight` and pass it to `sort.Sort`:
+
+.play go4gophers/organs2.go /START/,/STOP/
+
+
+* Interfaces: why they work (continued)
+
+Interfaces are _the_ generic programming mechanism.
+
+This gives all Go code a familiar shape.
+
+Less is more.
+
+
+* Interfaces: why they work (continued)
+
+It's all about composition.
+
+Interfaces—by design and convention—encourage us to write composable code.
+
+
+Interfaces types are just types
+and interface values are just values.
+
+They are orthogonal to the rest of the language.
+
+* Concurrency : the go way
+
+* Concurrency : First Impression
+My firt exposure to concurrency was C, Java.
+
+A little bit with node.
+
+I hate callback.
+
+I do like the actor (akka) way.
+
+
+* Concurrency: the Go way
+
+Goroutines provide concurrent execution.
+
+Channels express the communication and synchronization of independent processes.
+
+Select enables computation on channel operations.
+
+.image img/gopherflag.png
+
+
+* Concurrency
+
+It is part of the language, not a library.
+
+Based on two concepts:
+
+- goroutines: lightweight threads
+- channels: typed pipes used to communicate and synchronize between goroutines
+
+So cheap you can use them whenever you want.
+
+.image img/funnelin.jpg 300 700
+
+* Sleep and talk
+
+.code code/conc1.go /sleepAndTalk/,/^}/
+
+We want a message per second.
+
+.play code/conc1.go /func main/,/^}/
+
+What if we started all the `sleepAndTalk` concurrently?
+
+Just add `go`!
+
+* Concurrent sleep and talk
+
+.play code/conc2.go /func main/,/^}/
+
+That was fast ...
+
+When the `main` goroutine ends, the program ends.
+
+* Concurrent sleep and talk with more sleeping
+
+.play code/conc3.go /func main/,/^}/
+
+But synchronizing with `Sleep` is a bad idea.
+
+* Communicating through channels
+
+`sleepAndTalk` sends the string into the channel instead of printing it.
+
+.code code/chan.go /sleepAndTalk/,/^}/
+
+We create the channel and pass it to `sleepAndTalk`, then wait for the values to be sent.
+
+.play code/chan.go /func main/,/^}/
+
+* Let's count on the web
+
+We receive the next id from a channel.
+
+.code code/goodcounter.go /nextID/,/^}/
+
+We need a goroutine sending ids into the channel.
+
+.play code/goodcounter.go /func main/,/^}/
+
+
+* Error handling
+
+
+* Error handling: first impressions
+
+I had previously used exceptions to handle errors.
+
+Go's error handling model felt verbose by comparison.
+
+I was immediately tired of typing this:
+
+	if err != nil {
+		return err
+	}
+
+
+* Error handling: the Go way
+
+Go codifies errors with the built-in `error` interface:
+
+	type error interface {
+		Error() string
+	}
+
+Error values are used just like any other value.
+
+	func doSomething() error
+
+	err := doSomething()
+	if err != nil {
+		log.Println("An error occurred:", err)
+	}
+
+Error handling code is just code.
