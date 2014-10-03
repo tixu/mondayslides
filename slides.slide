@@ -1,4 +1,4 @@
-# http://godoc.org/code.google.com/p/go.tools/present
+﻿# http://godoc.org/code.google.com/p/go.tools/present
 # Present files have the following format.
 # The first non-blank non-comment line is the title.
 # The subtitle, date, and tags lines are optional.
@@ -347,7 +347,7 @@ Anything that implements `String` is a `Stringer`.
 
 `sort.Sort` uses can sort a `[]int` with `IntSlice`:
 
-.play go4gophers/sort.go /START/,/STOP/
+.play code/sort.go /START/,/STOP/
 * Another interface example
 
 The `Organ` type describes a body part and can print itself:
