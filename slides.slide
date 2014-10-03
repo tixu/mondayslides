@@ -352,18 +352,18 @@ Anything that implements `String` is a `Stringer`.
 
 The `Organ` type describes a body part and can print itself:
 
-.play go4gophers/organs.go /type Organ/,$
+.play code/organs.go /type Organ/,$
 
 
 * Sorting organs
 
 The `Organs` type knows how to describe and mutate a slice of organs:
 
-.code go4gophers/organs2.go /PART1/,/PART2/
+.code code/organs2.go /PART1/,/PART2/
 
 The `ByName` and `ByWeight` types embed `Organs` to sort by different fields:
 
-.code go4gophers/organs2.go /PART2/,/PART3/
+.code code/organs2.go /PART2/,/PART3/
 
 With embedding we compose _types_.
 
@@ -372,7 +372,7 @@ With embedding we compose _types_.
 
 To sort a `[]*Organ`, wrap it with `ByName` or `ByWeight` and pass it to `sort.Sort`:
 
-.play go4gophers/organs2.go /START/,/STOP/
+.play code/organs2.go /START/,/STOP/
 
 
 * Interfaces: why they work (continued)
